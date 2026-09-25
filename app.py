@@ -12,7 +12,6 @@ st.caption("Upload a 15-second clip to generate an instant tactical report evalu
 # Sidebar: Configuration
 with st.sidebar:
     st.header("⚙️ Configuration")
-    api_key = st.text_input("Google Gemini API Key", type="password", help="Get your free key at Google AI Studio")
 
     st.subheader("📋 Game Model Principles")
     game_model = st.selectbox(
@@ -32,6 +31,13 @@ with st.sidebar:
     team_color = st.text_input("Team to Analyze (Shirt Color):", value="Blue / White")
 
     st.divider()
+
+    # Load the Gemini API key from Streamlit secrets — never shown to or entered by the visitor
+    try:
+        api_key = st.secrets["GEMINI_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        api_key = None
+        st.error("⚠️ App is missing its Gemini API key. (Site owner: add GEMINI_API_KEY to your Streamlit secrets.)")
 
     # Dynamic model selector
     selected_model = None
@@ -67,7 +73,7 @@ if uploaded_file:
         st.subheader("📊 Tactical Report")
         if st.button("🚀 Analyze Play", type="primary"):
             if not api_key:
-                st.error("Please enter your API Key in the sidebar.")
+                st.error("The app isn't configured with an API key yet — please try again later.")
             else:
                 with st.spinner("Analyzing spacing, pitch occupation, and game-model compliance..."):
                     try:
