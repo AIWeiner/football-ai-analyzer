@@ -85,7 +85,7 @@ football-ai-analyzer/
 - Currently tuned for short clips (~15–20 sec) rather than full-match footage.
 - Analysis quality depends entirely on Gemini's video understanding for the active model — there's no dedicated tracking or event-detection layer (yet).
 - The app currently runs on a single shared API key, so it's open to anyone with the link; a lightweight access gate is a natural next step if usage grows.
-- Planned: persisting past reports, comparing multiple clips over a match, and exploring a tracking-data overlay.
+- Planned: To provide a set of tracking-data explanation and extent the video length limit.
 
 ## About
 
