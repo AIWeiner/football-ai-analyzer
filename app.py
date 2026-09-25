@@ -39,25 +39,9 @@ with st.sidebar:
         api_key = None
         st.error("⚠️ App is missing its Gemini API key. (Site owner: add GEMINI_API_KEY to your Streamlit secrets.)")
 
-    # Dynamic model selector
-    selected_model = None
-    if api_key:
-        try:
-            client = genai.Client(api_key=api_key)
-            valid_models = []
-            for m in client.models.list():
-                # Only keep models that support the generateContent action (video/text analysis)
-                if "generateContent" in getattr(m, 'supported_actions', []):
-                    valid_models.append(m.name.replace("models/", ""))
-
-            if valid_models:
-                valid_models.sort(reverse=True)
-                st.subheader("🤖 AI Engine")
-                selected_model = st.selectbox("Available model:", valid_models)
-            else:
-                st.warning("No valid model available for this key.")
-        except Exception:
-            st.error("Error validating the API Key or listing available models.")
+    # Fixed AI engine — no need to list/select models, always use Gemini 3.5 Flash-Lite
+    selected_model = "gemini-3.5-flash-lite"
+    st.caption("🤖 Powered by Gemini 3.5 Flash-Lite")
 
 # Main section: Video upload
 uploaded_file = st.file_uploader("Upload the play clip (MP4, MOV — max. 15-20 sec)", type=["mp4", "mov", "avi"])
