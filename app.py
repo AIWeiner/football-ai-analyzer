@@ -16,7 +16,7 @@ with st.sidebar:
 
     st.subheader("📋 Game Model Principles")
     game_model = st.selectbox(
-        "Select the Tactical Philosophy:",
+        "Select the Tactical Philosophy For Play Assessment:",
         [
             "Positional Play: Short passing, fix-and-split, width via wingers, passes between the lines and third-man combinations.",
             "High Press After Loss (Gegenpressing): Immediate pressure within 5 seconds, high block, space compression.",
