@@ -1,4 +1,5 @@
 import os
+import time
 import tempfile
 import streamlit as st
 from google import genai
@@ -39,9 +40,31 @@ with st.sidebar:
         api_key = None
         st.error("⚠️ App is missing its Gemini API key. (Site owner: add GEMINI_API_KEY to your Streamlit secrets.)")
 
-    # Fixed AI engine — no need to list/select models, always use Gemini 3.5 Flash-Lite
-    selected_model = "gemini-3.5-flash-lite"
-    st.caption("🤖 Powered by Gemini 3.5 Flash-Lite")
+    # Preferred model, with fallbacks in case Google's capacity for one is temporarily overloaded (503)
+    MODEL_FALLBACK_CHAIN = ["gemini-3.5-flash-lite", "gemini-2.5-flash-lite", "gemini-2.5-flash"]
+    st.caption("🤖 Powered by Gemini 3.5 Flash-Lite (with automatic fallback if overloaded)")
+
+def generate_with_fallback(client, video_file, prompt, models, max_retries_per_model=2):
+    """Try each model in order; on a 503 (overloaded) error, back off briefly and
+    retry, then move on to the next model. Any other kind of error is raised
+    immediately instead of being retried."""
+    last_error = None
+    for model_name in models:
+        for attempt in range(max_retries_per_model):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=[video_file, prompt],
+                )
+                return response, model_name
+            except Exception as e:
+                last_error = e
+                if "503" in str(e) or "UNAVAILABLE" in str(e):
+                    time.sleep(2 ** attempt)  # 1s, then 2s before giving up on this model
+                    continue
+                raise  # a non-overload error shouldn't be retried
+    raise last_error
+
 
 # Main section: Video upload
 uploaded_file = st.file_uploader("Upload the play clip (MP4, MOV — max. 15-20 sec)", type=["mp4", "mov", "avi"])
@@ -93,10 +116,9 @@ if uploaded_file:
                         - Provide 1 corrective, actionable recommendation for the coaching staff to work on with the squad.
                         """
 
-                        # 4. Generate the report
-                        response = client.models.generate_content(
-                            model=selected_model,
-                            contents=[video_file, prompt],
+                        # 4. Generate the report, falling back across models if overloaded
+                        response, used_model = generate_with_fallback(
+                            client, video_file, prompt, MODEL_FALLBACK_CHAIN
                         )
 
                         # 5. Render the result
