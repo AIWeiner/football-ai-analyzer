@@ -91,4 +91,4 @@ football-ai-analyzer/
 
 Built as a personal research project for football analysis, to test my knowledge and handling of current AI capabilities and bases about tactical assessment. Feedback and ideas are welcome — feel free to open an issue.
 
-**Author:** Alejandro Gutiérrez Ramírez — [LinkedIn](https://www.linkedin.com/in/alewr)
+**Author:** Alejandro (Alex) Gutiérrez Ramírez — [LinkedIn](https://www.linkedin.com/in/alewr)
